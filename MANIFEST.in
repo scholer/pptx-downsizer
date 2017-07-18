@@ -1,0 +1,6 @@
+# Input file for distutils packaging.
+# Add all files that you want to include in the dist file.
+# OBS: All packages mentioned in `setup.py` are automatically included.
+# include README.md
+include README.rst
+include LICENSE
