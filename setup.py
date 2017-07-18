@@ -12,7 +12,7 @@ Release protocol:
    installed in "editable" mode with ``pip install -e .``.
    Verify that all entry points are functional and able to successfully complete.
    Preferably verify that it works both when invoked from console and from Automator scripts.
-   Also test that the setup.py and README.md is working (``docutils`` must be installed):
+   Also test that the setup.py and README.rst is correct (``docutils`` must be installed):
    ``python setup.py check --restructuredtext``
 
 2. Bump version number (``version``+``download_url`` in ``setup.py`` and ``version`` in ``pptx_downsizer/__init__.py``),
@@ -41,8 +41,10 @@ Release protocol:
    Use ``pip install -U pptx-downsizer`` to update, or do a complete 
    wipe+reinstall of the ``pptx-downsizer-pypi-test`` environment.
 
-7. Commit, tag, and push: 
-   Tag this version in git with ``git tag -a <version> -m "message"``, 
+7. Commit, tag, and push:
+   Add all updated files to git (``git status``, then ``git add -u``), 
+   and commit (``git commit -m "message"``).
+   Tag this version in git with ``git tag -a <version> -m "message"``,
    then push it with ``git push --follow-tags`` 
    (or ``git push --tags`` if you have already pushed the branch/commits)
    You can also create tags/releases using GitHub's interface, c.f. 
