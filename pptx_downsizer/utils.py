@@ -32,11 +32,33 @@ def convert_str_to_int(s, do_float=True, do_eval=True):
             try:
                 return convert_str_to_int(float(s), do_float=False, do_eval=False)
             except ValueError as e:
-                if do_eval:
-                    return convert_str_to_int(eval(s), do_float=do_float, do_eval=False)
+                try:
+                    import humanfriendly
+                except ImportError:
+                    print((
+                        "Warning, the `humanfriendly` package is not available."
+                        "If you want to use e.g. \"500kb\" as filesize, "
+                        "please install the `humanfriendly` package:\n"
+                        "    pip install humanfriendly\n"))
+                    pass
+                    humanfriendly = None
                 else:
+                    try:
+                        return humanfriendly.parse_size(s)
+                    except humanfriendly.InvalidSize:
+                        pass
+
+                if do_eval:
+                    try:
+                        return convert_str_to_int(eval(s), do_float=do_float, do_eval=False)
+                    except (ValueError, SyntaxError) as e:
+                        print("Error, could not parse/convert string %r as integer. " % (s,))
+                        raise e
+                else:
+                    print("Error, could not parse/convert string %r as integer. " % (s,))
                     raise e
         else:
+            print("Error, could not parse/convert string %r as integer. " % (s,))
             raise e
 
 
