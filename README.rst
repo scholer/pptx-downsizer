@@ -98,9 +98,9 @@ are down-sized to 1 MB (≈ 1'000'000 bytes)::
     pptx_downsizer "Presentation.pptx" --fsize-filter 1e6
 
 If you want to disable down-scaling of large high-resolution images, set
-``img-size-filter`` to 0::
+``img-max-size`` to 0::
 
-    pptx_downsizer "Presentation.pptx" --img-size-filter 0
+    pptx_downsizer "Presentation.pptx" --img-max-size 0
 
 If you want to convert large images to JPEG format::
 
@@ -120,12 +120,12 @@ This should produce an output similar to the following::
 
     $ pptx_downsizer --help
     usage: pptx_downsizer [-h] [--fname-filter GLOB] [--fsize-filter SIZE]
-                          [--img-size-filter PIXELS] [--convert-to IMAGE_FORMAT]
+                          [--convert-to IMAGE_FORMAT] [--img-max-size PIXELS]
                           [--img-mode MODE] [--fill-color COLOR]
                           [--quality [1-100]] [--optimize] [--no-optimize]
-                          [--on-error DO-WHAT] [--outputfn_fmt FORMAT-STRING]
-                          [--overwrite] [--compress-type ZIP-TYPE]
-                          [--wait-before-zip] [--verbose [0-5]]
+                          [--outputfn_fmt FORMAT-STRING] [--overwrite]
+                          [--compress-type ZIP-TYPE] [--wait-before-zip]
+                          [--on-error DO-WHAT] [--verbose [0-5]]
                           filename
 
     PowerPoint pptx downsizer. Reduce the file size of PowerPoint presentations by
@@ -141,12 +141,13 @@ This should produce an output similar to the following::
                             e.g. '*.TIFF' (default: None)
       --fsize-filter SIZE   Convert all images with a current file size exceeding
                             this limit, e.g. '1e6' for 1 MB. (default: 524288)
-      --img-size-filter PIXELS
-                            Convert all images larger than this size (width or
-                            height). (default: 2048)
       --convert-to IMAGE_FORMAT
                             Convert images to this image format, e.g. `png` or
                             `jpeg`. (default: png)
+      --img-max-size PIXELS
+                            If images are larger than this size (width or height),
+                            reduce/downscale the image size to make it less than
+                            this size. (default: 2048)
       --img-mode MODE       Convert images to this image mode before saving them,
                             e.g. 'RGB' - advanced option. (default: None)
       --fill-color COLOR    If converting image mode (e.g. from RGBA to RGB), use
@@ -158,10 +159,6 @@ This should produce an output similar to the following::
                             images, but disabling it may make the conversion run
                             faster. Enabled by default. (default: True)
       --no-optimize         Disable optimization. (default: False)
-      --on-error DO-WHAT    What to do if the program encounters any errors during
-                            execution. `continue` will cause the program to
-                            continue even if one or more images fails to be
-                            converted. (default: continue)
       --outputfn_fmt FORMAT-STRING
                             How to format the downsized presentation pptx filename
                             Slightly advanced, uses python string formatting.
@@ -175,9 +172,14 @@ This should produce an output similar to the following::
                             converting all images before re-zipping the output
                             pptx file. You can use this to make manual changes to
                             the presentation - advanced option. (default: False)
+      --on-error DO-WHAT    What to do if the program encounters any errors during
+                            execution. `continue` will cause the program to
+                            continue even if one or more images fails to be
+                            converted. (default: raise)
       --verbose [0-5]       Increase or decrease the 'verbosity' of the program,
                             i.e. how much information it prints about the process.
                             (default: 2)
+
 
 
 Installation:

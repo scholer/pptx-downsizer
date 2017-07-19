@@ -62,7 +62,8 @@ Release protocol:
    and commit (``git commit -m "message"``).
    Tag and annotate this version in git with ``git tag -a <version> -m "message"``,
    then push it with ``git push --follow-tags`` 
-   (or ``git push --tags`` if you have already pushed the branch/commits)
+   (or ``git push --tags`` if you have already pushed the branch/commits).
+   Check that everything looks good on the GitHub page, https://github.com/scholer/pptx-downsizer
    You can also create tags/releases using GitHub's interface, c.f. 
    https://help.github.com/articles/creating-releases/.
 

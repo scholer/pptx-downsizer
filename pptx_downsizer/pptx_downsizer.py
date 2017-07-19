@@ -30,10 +30,10 @@ def downsize_pptx_images(
     filename,
     # Image selection:
     fname_filter=None,  # Only filter files matching this filter (str or callable or None) - or maybe OR filter?
-    fsize_filter=int(0.5*2**20),  # Only downsample files above this filesize (number or None)
-    img_size_filter=2048,
+    fsize_filter=int(0.5*2**20),  # Only convert/reduce files above this filesize (number or None)
     # Image conversion/save:
     convert_to="png",
+    img_max_size=2048,
     quality=90,
     optimize=True,
     img_mode=None,
@@ -55,9 +55,10 @@ def downsize_pptx_images(
 
         fname_filter: Convert images matching this filename glob pattern, e.g. "*.TIFF".
         fsize_filter: Convert images with file size larger than this limit in bytes.
-        img_size_filter: Convert images larger than this limit (width or height) in pixels.
 
         convert_to: Convert images to this image format - e.g. 'png' or 'jpeg'.
+        img_max_size: If an image is larger than this limit (width or height, in pixels),
+            downscale/reduce the image to this size.
         quality: Save images with this quality parameter (JPEG only).
         optimize: Attempt to optimize the image output (for `PIL.Image.save`)
         img_mode: Convert images to this mode before saving - e.g. 'RGB'.
@@ -95,8 +96,8 @@ def downsize_pptx_images(
     filter_desc = []
     if fsize_filter:
         filter_desc.append("above %0.01f kB" % (fsize_filter/2**10,))
-    if img_size_filter:
-        filter_desc.append("larger than %s pixels" % img_size_filter)
+    if img_max_size:
+        filter_desc.append("larger than %s pixels" % img_max_size)
     if fname_filter:
         filter_desc.append("with filename matching %r" % fname_filter)
 
@@ -136,8 +137,8 @@ def downsize_pptx_images(
             else:
                 outputfn = fnbase + output_ext
             img = Image.open(imgfn)
-            if img_size_filter and (img.height > img_size_filter or img.width > img_size_filter):
-                downscalefactor = (max(img.size) // img_size_filter) + 1
+            if img_max_size and (img.height > img_max_size or img.width > img_max_size):
+                downscalefactor = (max(img.size) // img_max_size) + 1
                 newsize = tuple(v // downscalefactor for v in img.size)
                 if verbose and verbose > 1:
                     print(" - Resizing %sx, from %s to %s" % (downscalefactor, img.size, newsize))
@@ -252,11 +253,12 @@ def get_argparser(defaults=None):
         "Convert all images matching this filename pattern, e.g. '*.TIFF'"))
     ap.add_argument("--fsize-filter", metavar="SIZE", default=defaults['fsize_filter'], help=(
         "Convert all images with a current file size exceeding this limit, e.g. '1e6' for 1 MB."))
-    ap.add_argument("--img-size-filter", metavar="PIXELS", default=defaults['img_size_filter'], type=int, help=(
-        "Convert all images larger than this size (width or height)."))
     # image convert/output/save options:
     ap.add_argument("--convert-to", metavar="IMAGE_FORMAT", default=defaults['convert_to'], help=(
         "Convert images to this image format, e.g. `png` or `jpeg`."))
+    ap.add_argument("--img-max-size", metavar="PIXELS", default=defaults['img_max_size'], type=int, help=(
+        "If images are larger than this size (width or height), "
+        "reduce/downscale the image size to make it less than this size."))
     ap.add_argument("--img-mode", metavar="MODE", default=defaults['img_mode'], help=(
         "Convert images to this image mode before saving them, e.g. 'RGB' - advanced option."))
     ap.add_argument("--fill-color", metavar="COLOR", default=defaults['fill_color'], help=(
