@@ -34,21 +34,21 @@ However, once you realize that your presentation is 100+ MBs, you don't
 have the time to re-save a lower-quality version of each image and then
 substitute that image in the presentation.
 
-Q: What to do?
+*Q: What to do?*
 
-A: **First**, use the built-in "Compress Pictures" feature: Go "File ->
-Compress pictures", or select any image, go to the "Picture Tools"
-toolbar, and select the "Compress Pictures" icon (four arrows pointing
-to the corners of an image). This tool allows you to down-scale pictures
-and removed cropped-out areas, and can be applied to all pictures in the
-presentation at once, *but does not change the image format of pictures
-in the presentation.*
+**A: First**,
+  use the built-in "Compress Pictures" feature: Go "File ->
+  Compress pictures", or select any image, go to the "Picture Tools"
+  toolbar, and select the "Compress Pictures" icon (four arrows pointing
+  to the corners of an image). This tool allows you to down-scale pictures
+  and removed cropped-out areas, and can be applied to all pictures in the
+  presentation at once, *but does not change the image format of pictures
+  in the presentation.*
+  Make sure to save your presentation under a new name, in case you realize
+  you need to some of the original, uncompressed pictures!
 
-Make sure to save your presentation under a new name, in case you want
-to revert some of the compressed pictures!
-
-A: **Then**, if the presentation file size is still excessive, use
-``pptx-downsizer``!
+**A: Then**,
+  if the presentation file size is still excessive, use ``pptx-downsizer``!
 
 ``pptx-downsizer`` will go over all images in your presentation (pptx),
 and down-size all images above a certain size.
@@ -78,8 +78,38 @@ much you are willing to compromise quality when compressing your images.
 You can use the ``--quality`` parameter to adjust quality of JPEG images.
 
 
-Examples:
----------
+How ``pptx-downsizer`` works:
+-----------------------------
+
+1. First it unzips the ``.pptx`` PowerPoint file to a temporary directory.
+   Other ooxml files probably works as well, e.g. ``.docx`` Word files.
+2. Then, ``pptx-downsizer`` searches for image files with large file size.
+   The file size is controlled with the ``fsize-filter`` parameter.
+   It is possible to add additional file-selection filter criteria,
+   e.g. set ``fname-filter="*.TIFF"`` to only convert TIFF image files,
+   although this is typically not needed.
+3. ``pptx-downsizer`` will then go through all selected images and try
+   to minimize them in the following ways:
+
+   a. If the image dimensions are larger than ``img-max-size``,
+      ``pptx-downsizer`` will reduce the image dimensions (by an interger
+      factor) so that the image is smaller than ``img-max-size``.
+   b. The image is then resaved in the selected format (default: jpeg) and
+      quality (default: 90). ``pptx-downsizer`` can also be used to change
+      image modes, e.g. convert transparent regions of PNG images to a solid
+      color by setting ``--img-mode="rgb" --fill-color="#ffffff"``.
+
+4. Finally, the ``.pptx`` PowerPoint file is re-created and re-saved as
+   ``Presentation.downsized.pptx``.
+
+Note: It is often useful to do multiple rounds of downsizing, e.g. first
+converting all large TIFF files to PNG format, then downsizing the downsized
+``pptx`` to convert the biggest PNG images to JPEG (see "Examples" below).
+
+
+
+Examples usage:
+---------------
 
 Make sure to save your presentation (and, preferably exit PowerPoint,
 and make a backup of your presentation just in case).
@@ -88,23 +118,32 @@ Let's say you have your original, large presentation saved as
 ``Presentation.pptx``
 
 After installing ``pptx-downsizer``, you can run the following from your
-terminal (notice the substitution of the hyphen for an underscore)::
+terminal::
 
-    pptx_downsizer "Presentation.pptx"
+    pptx-downsizer "Presentation.pptx"
 
 If you want to change the file size limit used to determine what images
 are down-sized to 1 MB (≈ 1'000'000 bytes)::
 
-    pptx_downsizer "Presentation.pptx" --fsize-filter 1e6
+    pptx-downsizer "Presentation.pptx" --fsize-filter 1e6
 
 If you want to disable down-scaling of large high-resolution images, set
 ``img-max-size`` to 0::
 
-    pptx_downsizer "Presentation.pptx" --img-max-size 0
+    pptx-downsizer "Presentation.pptx" --img-max-size 0
 
 If you want to convert large images to JPEG format::
 
-    pptx_downsizer "Presentation.pptx" --convert-to jpeg
+    pptx-downsizer "Presentation.pptx" --convert-to jpeg
+
+**Advanced usage:** Pause before re-creating the PowerPoint file.
+Let's say you are a power user, and you need to do something very specific
+to some or all of the images in your presentation. For instance, adding
+watermarks before sending the presentation to someone else.
+If you pass ``--wait-before-zip`` to ``pptx-downsizer``, the program will
+wait before it re-creates the presentation (but after downsizing the images).
+
+
 
 
 Command line arguments:
@@ -113,13 +152,13 @@ Command line arguments:
 You can always get a complete description of the program and the
 available command line arguments (parameters) by invoking::
 
-    pptx_downsizer --help
+    pptx-downsizer --help
 
 
 This should produce an output similar to the following::
 
-    $ pptx_downsizer --help
-    usage: pptx_downsizer [-h] [--fname-filter GLOB] [--fsize-filter SIZE]
+    $ pptx-downsizer --help
+    usage: pptx-downsizer [-h] [--fname-filter GLOB] [--fsize-filter SIZE]
                           [--convert-to IMAGE_FORMAT] [--img-max-size PIXELS]
                           [--img-mode MODE] [--fill-color COLOR]
                           [--quality [1-100]] [--optimize] [--no-optimize]
@@ -193,10 +232,9 @@ With python installed, install ``pptx-downsizer`` using ``pip``::
     pip install pptx-downsizer
 
 You can make sure ``pptx-downsizer`` is installed by calling it
-anywhere from the terminal / command prompt - notice the underscore
-in place of hyphen::
+anywhere from the terminal / command prompt::
 
-    pptx_downsizer
+    pptx-downsizer
 
 Note: You may want to install ``pptx-downsizer`` in a
 separate/non-default python environment. If you know what that means,
@@ -209,7 +247,7 @@ Troubleshooting and bugs:
 
 **NOTE:** ``pptx-downsizer`` is very early/beta software. I strongly
 recommend to (a) *back up your presentation to a separate folder before
-running* ``pptx_downsizer``, and (b) *work for as long as possible in
+running* ``pptx-downsizer``, and (b) *work for as long as possible in
 the original presentation.* That way, if ``pptx-downsizer`` doesn't
 work, you can always go back to your original presentation, and you will
 not have lost any work.
@@ -224,10 +262,10 @@ problem is. There are, unfortunately, a lot of things that could be
 wrong, and without the original presentation, I probably cannot diagnose
 the issue.
 
-**OBS: If PowerPoint gives you errors when opening the downsized file,
+*OBS: If PowerPoint gives you errors when opening the downsized file,
 please don't bother trying to fix the downsized file yourself. You may
 run into unexpected errors later. Instead, just continue working with
-your original presentation.**
+your original presentation.*
 
 Q: Why doesn't ``pptx-downsizer`` work?
 
@@ -239,6 +277,6 @@ Q: Does ``pptx-downsizer`` overwrite the original presentation file?
 
 A: No, by default ``pptx-downsizer`` will create a new file with
 ".downsized" added to the filename. If this output file already exists,
-``pptx_downloader`` will let you know, giving you a change to (manually)
+``pptx-downsizer`` will let you know, giving you a change to (manually)
 move/rename the existing file if you want to keep it. You can disable
 this prompt using the ``--overwrite`` argument.

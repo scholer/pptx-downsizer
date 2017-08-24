@@ -8,9 +8,10 @@ except ImportError:
 
 Python environments::
     
-``pptx-downsizer-dev``:
+``pptx-downsizer-dev``::
     Has main git repo installed in "editable" mode with ``pip install -e .``
     ``conda create -n pptx-downsizer-dev python pip pillow pyyaml docutils pandoc`` 
+    ``source activate pptx-downsizer-dev``
 
 ``pptx-downsizer-build-test``:
     For installing the ``dist/pptx-downsizer-<verson>.tar.gz`` builds.
@@ -18,6 +19,7 @@ Python environments::
 
 ``pptx-downsizer-pypi-test``:
     For testing the package uploaded to PyPI.
+    ``source activate pptx-downsizer-pypi-test``
     
 
 Release protocol:
@@ -31,26 +33,30 @@ Release protocol:
 
    ``python setup.py check --restructuredtext``  (``docutils`` must be installed)
 
-2. Bump version number:
-   ``version``+``download_url`` in ``setup.py`` 
-   and ``version`` in ``pptx_downsizer/__init__.py``),
-   then ``git commit`` (or maybe do that after uploading release).
+2. Bump version number and update CHANGELOG:
+   a. Update ``version``+``download_url`` in ``setup.py``.
+   b. Update ``version`` in ``<package root dir>/__init__.py``.
+   c. Update CHANGELOG, adding information about what has changed since last release.
+   d. Finally ``git commit`` (or maybe do that after testing, uploading, and verifying release).
 
 3. Build release:
     (a) Change to dedicated build/dist environment, e.g. ``pptx-downsizer-build-test``.
-    (b) Clear the old version: ``pip uninstall pptx-downsizer`` (or do a complete wipe).
+    (b) Clear the old version: ``pip uninstall pptx-downsizer`` (or do a complete environment wipe).
     (c) Go to project root directory in terminal and build release with ``python setup.py sdist``,
-    (d) Install build in sdist environment using ``pip install dist/pptx-downsizer-<version>.tar.gz``,
+    (d) Install build in sdist environment using 
+        ``pip install dist/pptx-downsizer-<version>.tar.gz``,
     (e) Run tests and verify that all entry points are working.
 
 4. Register upload release and source distribution to PyPI TEST site:
-   ``python setup.py sdist upload -r pypitest_legacy``,
+   ``$ python setup.py sdist upload -r pypitest_legacy``,
    then check https://testpypi.python.org/pypi/pptx-downsizer/ and make sure it looks right.
    Note: Previously, this was a two-step process, requiring pre-registration with 
-   ``python setup.py register -r pypi(test)``. This is no longer needed.  
+   ``$ python setup.py register -r pypi(test)``. This is no longer needed.  
 
 5. Register and upload release to production PyPI site and check https://pypi.python.org/pypi/pptx-downsizer/
-   ``python setup.py sdist upload -r pypi``.
+   ``$ python setup.py sdist upload -r pypi_legacy``.
+   for legacy API, or if you have Python 3.6+:
+   ``$ python setup.py sdist upload -r pypi``.
 
 6. Test the PYPI release using the ``pptx-downsizer-pypi-test`` environment,
    preferably also on a different platforms as well (Windows/Mac/Linux).
@@ -74,9 +80,9 @@ If you find an error at any point, go back to step 1.
 
 Typical testing::
 
-    pptx_downsizer "Presentation.pptx" --verbose 2
+    pptx-downsizer "Presentation.pptx" --verbose 2
 
-    pptx_downsizer "Presentation.downsized.pptx" --convert-to jpeg --fsize-filter 1e6 --verbose 2
+    pptx-downsizer "Presentation.downsized.pptx" --convert-to jpeg --fsize-filter 1e6 --verbose 2
 
 
 Regarding PyPI and packaging/distribution:
@@ -122,9 +128,9 @@ setup(
     long_description=long_description,
     url='https://github.com/scholer/pptx-downsizer',
     packages=['pptx_downsizer'],  # List all packages (directories) to include in the source dist.
-    version='0.1.2',  # Update for each new version
-    download_url='https://github.com/scholer/pptx-downsizer/tarball/0.1.2',  # Update for each new version
-    # download_url='https://github.com/scholer/pptx_downsizer/archive/master.zip',
+    version='0.1.3-dev',  # Update for each new version
+    download_url='https://github.com/scholer/pptx-downsizer/tarball/0.1.3',  # Update for each new version
+    # download_url='https://github.com/scholer/pptx-downsizer/archive/master.zip',
     author='Rasmus Scholer Sorensen',
     author_email='rasmusscholer@gmail.com',
     license='GNU General Public License v3 (GPLv3)',
@@ -142,7 +148,8 @@ setup(
     entry_points={
         'console_scripts': [
             # These should all be lower-case, else you may get an error when uninstalling:
-            'pptx_downsizer=pptx_downsizer.pptx_downsizer:cli',
+            # Dash/hyphen or underscore to separate words? Linux is about 50/50, but Python and Git leans towards dash.
+            'pptx-downsizer=pptx_downsizer.pptx_downsizer:cli',
         ],
     },
     # install_requires: Minimal requirement for this project.

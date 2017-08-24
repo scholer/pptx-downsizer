@@ -4,6 +4,19 @@ import zipfile
 
 
 def zip_directory(directory, targetfn=None, relative=True, compress_type=zipfile.ZIP_DEFLATED, verbose=1):
+    """Zip all files and folders in a directory.
+
+    Args:
+        directory: The directory whose contents should be zipped.
+        targetfn: Output filename of the zipped archive.
+        relative: If True, make the arcname relative to the input directory.
+        compress_type: Which kind of compression to use. See zipfile package.
+        verbose: How much information to print to stdout while creating the archive.
+
+    Returns:
+        The filename of the zipped archive.
+
+    """
     assert os.path.isdir(directory)
     if targetfn is None:
         targetfn = directory + ".zip"

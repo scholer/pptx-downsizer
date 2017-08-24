@@ -114,6 +114,7 @@ def downsize_pptx_images(
 
     output_ext = "." + convert_to.strip(".")
     changed_fns = []
+    new_zip_fn = outputfn_fmt.format(filename=filename, fnroot=pptx_fnroot)
     with tempfile.TemporaryDirectory() as tmpdirname:
         pptdir = os.path.join(tmpdirname, "ppt")
         mediadir = os.path.join(pptdir, "media")
@@ -210,7 +211,6 @@ You can find the unzipped files in the temporary directory:
     %s
 """ % tmpdirname)
             input("Press enter to continue...")
-        new_zip_fn = outputfn_fmt.format(filename=filename, fnroot=pptx_fnroot)
         if os.path.exists(new_zip_fn) and not overwrite:
             print(("\nNOTICE: Output file already exists. If you want to keep the old file,\n%r,\n"
                    "please move/rename it before continuing. ") % (new_zip_fn,))
@@ -227,12 +227,14 @@ Notice: This pptx downsizing was done using PNG images (the default setting).
 PNG format preserves the appearance and quality of images very well, 
 but may result in large file sizes for complex pictures with lots of fine details. 
 If you noticed that some files were still excessive in size (in the output above), 
-try running pptx_downsizer again with `--convert-to jpeg` as argument. """)
+try running pptx-downsizer again with `--convert-to jpeg` as argument, e.g.: 
+    $ pptx-downsizer "{}" --convert-to jpeg""".format(new_zip_fn))
 
     return new_zip_fn
 
 
 # Consider using `click` package instead of argparse, since the CLI maps so directly to a single function.
+# See https://gist.github.com/scholer/fbfdaa1fb30ad296cb6b06b0446a2307 for a discussion of CLI packages.
 
 def get_argparser(defaults=None):
     if defaults is None:
