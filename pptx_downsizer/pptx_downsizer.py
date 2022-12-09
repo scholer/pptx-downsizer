@@ -15,6 +15,7 @@ Currently only supports downsizing of images (not e.g. videos).
 import argparse
 import inspect
 import os
+import io
 import tempfile
 import zipfile
 from fnmatch import fnmatch
@@ -132,12 +133,25 @@ def downsize_pptx_images(
             old_img_fsize = os.path.getsize(imgfn)
             print("Converting %r (%s kb)..." % (imgfn,  old_img_fsize//1024))
             fnbase, fnext = os.path.splitext(imgfn)
+            img_bytes = None
             if fnext == '.jpg' or fnext == '.jpeg':
                 print(" - Preserving JPEG image format for file %r." % (imgfn,))
                 outputfn = imgfn
             else:
                 outputfn = fnbase + output_ext
-            img = Image.open(imgfn)
+                if fnext == '.svg':
+                    from svglib.svglib import svg2rlg
+                    from reportlab.graphics import renderPM
+
+                    # Convert from svg to png so Pillow can read and process it
+                    print(" - Converting SVG file to intermediate PNG for file %r." % (imgfn,))
+                    drawing = svg2rlg(imgfn)
+                    img_bytes = io.BytesIO()
+                    renderPM.drawToFile(drawing, img_bytes, fmt="PNG")
+                    img_bytes.seek(0)
+
+            img = Image.open(img_bytes if img_bytes is not None else imgfn)
+
             if img_max_size and (img.height > img_max_size or img.width > img_max_size):
                 downscalefactor = (max(img.size) // img_max_size) + 1
                 newsize = tuple(v // downscalefactor for v in img.size)
