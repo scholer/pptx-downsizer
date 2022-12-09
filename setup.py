@@ -10,7 +10,7 @@ Python environments::
     
 ``pptx-downsizer-dev``::
     Has main git repo installed in "editable" mode with ``pip install -e .``
-    ``conda create -n pptx-downsizer-dev python pip pillow pyyaml docutils pandoc`` 
+    ``conda create -n pptx-downsizer-dev python pip pillow pyyaml svg2rlg renderPM docutils pandoc``
     ``source activate pptx-downsizer-dev``
 
 ``pptx-downsizer-build-test``:
@@ -157,6 +157,8 @@ setup(
     install_requires=[
         'pyyaml',
         'pillow',
+        'svg2rlg',
+        'renderPM',
     ],
     classifiers=[
         # https://pypi.python.org/pypi?%3Aaction=list_classifiers
